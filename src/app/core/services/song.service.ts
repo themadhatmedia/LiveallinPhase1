@@ -32,8 +32,19 @@ export class SongService {
   }
 
   getSongs(): Observable<Song[]> {
-    return this.songsCollection.valueChanges();
+
+    var plan_name = this.auth.user.planName;
+    var plan_name = 'Early Bird Annual Plan';
+    console.log('Plan Name' +  plan_name);
+    console.log('song services call GetSongs');
+    this.songsCollectionByPlan = this.db.collection<Song>('songs',
+      ref => ref.where('plan_name', '==', plan_name));
+    return this.songsCollectionByPlan.valueChanges();
+
   }
+  /*getSongs(): Observable<Song[]> {
+    return this.songsCollection.valueChanges();
+  }*/
 
   downloadSongAudio(song: Song): Promise<any> {
     let fileName = song.title.replace(/[^A-Za-z]/g, '');
