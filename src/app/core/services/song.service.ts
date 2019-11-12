@@ -8,6 +8,8 @@ import { Song } from '../models/song.model';
 import { File } from '@ionic-native/file/ngx';
 import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer/ngx';
 
+import { AuthService } from '../../core/services/auth.service';
+
 @Injectable({ providedIn: 'root' })
 export class SongService {
 
@@ -15,9 +17,11 @@ export class SongService {
   meta: Observable<any>;
 
   songsCollection: AngularFirestoreCollection<Song>;
+  songsCollectionByPlan: AngularFirestoreCollection<Song>;
 
   constructor(
     private file: File,
+    private auth: AuthService,
     private helper: HelperService,
     private transfer: FileTransfer,
     private db: AngularFirestore,
