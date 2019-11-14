@@ -38,11 +38,11 @@ export class SongService {
   getSongs(): Observable<Song[]> {
 
     var plan_name = this.auth.user.planName;
-    var plan_name = 'Early Bird Annual Plan';
+    //var plan_name = 'LAI 2019 Annual Plan';
     console.log('Plan Name' +  plan_name);
     console.log('song services call GetSongs');
     this.songsCollectionByPlan = this.db.collection<Song>('songs',
-      ref => ref.where('plan_name', '==', plan_name));
+      ref => ref.where('plan_name', 'array-contains', plan_name));
     return this.songsCollectionByPlan.valueChanges();
 
   }
