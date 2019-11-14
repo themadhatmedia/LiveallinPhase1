@@ -16,6 +16,7 @@ import { MusicPlayerComponent } from '../core/components/music-player/music-play
 export class LibraryPage implements OnInit {
 
   allSongs: Song[] = [];
+  songsToDownload_new: Song[] = [];
 
   normalSongs: Song[] = [];
   instrumentalSongs: Song[] = [];
@@ -35,8 +36,57 @@ export class LibraryPage implements OnInit {
   }
 
   ngOnInit() {
-    this.getSongsFromDB();
+    //this.getSongsFromDB();
+
+    const songSub = this.songService.getSongs().subscribe(apiSongs => {
+      console.log('===== from Database ====');
+      console.log(apiSongs);
+      this.normalSongs = [];
+      this.instrumentalSongs = [];
+      this.backgroundVocalsSongs = [];
+      this.otherSongs = [];
+      this.songsToDownload_new = [];
+      this.filterSongsByReleaseDateNew(apiSongs); // All Songs may just be dbSongs
+      
+    });
+
   }
+
+
+  filterSongsByReleaseDateNew(songs: Song[]): void {
+    const currentDate = new Date();
+    // If it's a subscription user they only have access to songs since their signup date
+    if (this.auth.user.planType === 'subscription') {
+      songs = songs.filter(song => new Date(song.releaseDate) > new Date(this.auth.user.signUpDate));
+    } else if (this.auth.user.planType === 'charge' && !this.auth.user.planName.includes('Early')) {
+      songs = songs.filter(song => new Date(song.releaseDate) > new Date('12/31/18'));
+    }
+    const filteredSongs = songs.filter(song => new Date(song.releaseDate) < currentDate);
+    filteredSongs.forEach(song => {
+      if (song.audioPath) {
+        switch (song.songType) {
+          case SongType.Normal:
+            this.normalSongs.push(song);
+            break;
+          case SongType.Instrumental:
+            this.instrumentalSongs.push(song);
+            break;
+          case SongType.BackgroundVocals:
+            this.backgroundVocalsSongs.push(song);
+            break;
+          case SongType.Other:
+            this.otherSongs.push(song);
+            break;
+          default:
+            alert('Invalid Song Type');
+        }
+      } else {
+        this.songsToDownload_new.push(song);
+      }
+    });
+    this.sortSongs();
+  }
+
 
   downloadSong(song: Song, index: number): void {
     this.helper.presentLoading('Downloading Song');

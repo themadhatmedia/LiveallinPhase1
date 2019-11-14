@@ -58,13 +58,13 @@
         </ion-item>
       </ion-radio-group>
     </section>
-    <section *ngIf="songsToDownload.length > 0">
+    <section *ngIf="songsToDownload_new.length > 0">
       <ion-item-divider>
         <ion-label>
           Available to Download
         </ion-label>
       </ion-item-divider>
-      <ion-item *ngFor="let song of songsToDownload; let index = index" (click)="downloadSong(song, index)">
+      <ion-item *ngFor="let song of songsToDownload_new; let index = index" (click)="downloadSong(song, index)">
         <ion-label>{{ song.title }}</ion-label>
         <div class="get">Get</div>
       </ion-item>

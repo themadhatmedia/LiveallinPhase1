@@ -53,12 +53,16 @@ export class AuthService {
   login(email: string, password: string): Promise<any> {
     return this.auth.auth.signInWithEmailAndPassword(email, password).then(token => {
       console.log('token: ' + JSON.stringify(token));
-      // const userQuery = this.db.collection<User>('users', ref => ref.where('email', '==', token.user.email)).valueChanges();
-      // userQuery
-      // .subscribe(docs => {
-      //   this.user = docs[0];
-      //   console.log('user: ' + JSON.stringify(this.user));
-      // });
+
+      window.localStorage.setItem('userEmail',token.user.email);
+      const userQuery = this.db.collection<User>('users', ref => ref.where('email', '==', token.user.email)).valueChanges();
+      userQuery
+      .subscribe(docs => {
+        this.user = docs[0];
+        console.log('Plan Name = '+ this.user.planName);
+        window.localStorage.setItem('userPlan',this.user.planName);
+        //console.log(' == user:  ===' + JSON.stringify(this.user));
+      });
     });
   }
 
