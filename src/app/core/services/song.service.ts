@@ -35,15 +35,11 @@ export class SongService {
     this.songsCollection = this.db.collection<Song>('songs');
   }
 
-  getSongs(): Observable<Song[]> {
-
-    var plan_name = window.localStorage.getItem('userPlan')
-    
-    console.log('Plan Name' +  plan_name);
-    console.log('song services call GetSongs');
+  getSongs(isplan): Observable<Song[]> {
+    //var plan_name = window.localStorage.getItem('userPlan')
     
     this.songsCollectionByPlan = this.db.collection<Song>('songs',
-      ref => ref.where('plan_name', 'array-contains', plan_name));
+      ref => ref.where('plan_name', 'array-contains', isplan));
     return this.songsCollectionByPlan.valueChanges();
 
   }

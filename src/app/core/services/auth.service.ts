@@ -68,6 +68,7 @@ export class AuthService {
 
   logout(): void {
     this.auth.auth.signOut();
+    window.localStorage.removeItem('userPlan');
   }
 
   resetPassword(email: string): void {

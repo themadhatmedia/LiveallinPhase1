@@ -37,18 +37,32 @@ export class LibraryPage implements OnInit {
 
   ngOnInit() {
     //this.getSongsFromDB();
+    var userPlan = window.localStorage.getItem('userPlan');
+    var plan_arr = userPlan.split(',');
 
-    const songSub = this.songService.getSongs().subscribe(apiSongs => {
-      console.log('===== from Database ====');
-      console.log(apiSongs);
-      this.normalSongs = [];
-      this.instrumentalSongs = [];
-      this.backgroundVocalsSongs = [];
-      this.otherSongs = [];
-      this.songsToDownload_new = [];
-      this.filterSongsByReleaseDateNew(apiSongs); // All Songs may just be dbSongs
-      
+    this.normalSongs = [];
+    this.instrumentalSongs = [];
+    this.backgroundVocalsSongs = [];
+    this.otherSongs = [];
+    this.songsToDownload_new = [];
+
+    Object.keys(plan_arr).forEach(key=> {
+        //console.log(plan_arr[key])  ;     
+        let plan_name = plan_arr[key];
+        console.log('Plan == ' + plan_name);
+
+        const songSub = this.songService.getSongs(plan_name).subscribe(apiSongs => {
+          console.log(plan_name + '===== from Database ====');
+          console.log(apiSongs);
+          
+          //apiSongs.push(apiSongs);
+          this.filterSongsByReleaseDateNew(apiSongs); // All Songs may just be dbSongs
+          
+        });
+
     });
+
+    
 
   }
 
@@ -81,7 +95,32 @@ export class LibraryPage implements OnInit {
             alert('Invalid Song Type');
         }
       } else {
-        this.songsToDownload_new.push(song);
+
+        var my_songs = [];
+        console.log(this.songsToDownload_new);
+
+        if (this.songsToDownload_new.length == 0) {   
+           
+           this.songsToDownload_new.push(song);
+            
+
+          } else {
+
+            let isfound = 'true';
+            Object.keys(this.songsToDownload_new).forEach(key=> {                    
+                let plan_title = this.songsToDownload_new[key];
+                if(plan_title.title == song.title){                 
+                   isfound = 'false'; return false;
+                }
+              
+            });
+            if(isfound == 'true'){
+              this.songsToDownload_new.push(song);
+            }
+
+          }
+
+
       }
     });
     this.sortSongs();
@@ -162,7 +201,7 @@ export class LibraryPage implements OnInit {
 
   getSongsFromFirebase(): void {
     console.log('get songs');
-    const songSub = this.songService.getSongs().subscribe(apiSongs => {
+    const songSub = this.songService.getSongs('gggg').subscribe(apiSongs => {
       console.log(apiSongs);
       this.addNewSongs(apiSongs);
       console.log(this.allSongs);
