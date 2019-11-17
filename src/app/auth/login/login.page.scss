@@ -1,6 +1,7 @@
 #pre-login{
     position: absolute;
-    z-index: 1000;
+    z-index: 100;
+    display: block;
     top: 250px;
     left: 0;
     background-color: white;//lighten( #96bbcb, 20%);
@@ -20,9 +21,15 @@
         bottom: 25%;
     }
 }
+
+.no-overlay-forms {
+    z-index: 1 !important;
+}
+
 .no-overlay {
     z-index: 0 !important;
     position: absolute;
+    display: none;
     top: 0px;
     width: 100%;
     height: 90%;
@@ -68,6 +75,8 @@
 #form-fields {
     margin-top: calc(10px);
     margin-bottom: 40px;
+    position: relative;
+    z-index: -1;
 }
 .login-button {
     margin-bottom: 10px;

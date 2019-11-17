@@ -1,3 +1,4 @@
+
 import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
@@ -75,7 +76,7 @@ export class AuthService {
     this.auth.auth.sendPasswordResetEmail(email);
   }
 
-  /** 
+  /**
    *     public email: string = '',
     public firstName: string = '',
     public lastName: string = '',

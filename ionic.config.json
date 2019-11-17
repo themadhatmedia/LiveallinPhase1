@@ -1,7 +1,8 @@
 {
   "name": "lai",
   "integrations": {
-    "cordova": {}
+    "cordova": {},
+    "capacitor": {}
   },
   "type": "angular"
 }

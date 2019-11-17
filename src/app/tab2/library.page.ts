@@ -1,12 +1,12 @@
-import { AuthService } from './../core/services/auth.service';
-import { SongType } from './../core/models/song.model';
-import { HelperService } from './../core/services/helper.service';
-import { Component, OnInit } from '@angular/core';
-import { SongService } from '../core/services/song.service';
-import { Song } from '../core/models/song.model';
-import { NativeStorage } from '@ionic-native/native-storage/ngx';
-import { ModalController } from '@ionic/angular';
-import { MusicPlayerComponent } from '../core/components/music-player/music-player.component';
+import {AuthService} from './../core/services/auth.service';
+import {SongType} from './../core/models/song.model';
+import {HelperService} from './../core/services/helper.service';
+import {Component, OnInit} from '@angular/core';
+import {SongService} from '../core/services/song.service';
+import {Song} from '../core/models/song.model';
+import {NativeStorage} from '@ionic-native/native-storage/ngx';
+import {ModalController} from '@ionic/angular';
+import {MusicPlayerComponent} from '../core/components/music-player/music-player.component';
 
 @Component({
   selector: 'app-tab2',
@@ -23,7 +23,7 @@ export class LibraryPage implements OnInit {
   backgroundVocalsSongs: Song[] = [];
   otherSongs: Song[] = [];
   songsToDownload: Song[] = [];
-
+  saveSongsList: Song[] = [];
   selectedSong: Song = new Song();
 
   constructor(
@@ -32,38 +32,32 @@ export class LibraryPage implements OnInit {
     private modalCtrl: ModalController,
     private nativeStorage: NativeStorage,
     public songService: SongService
-    ) {
+  ) {
   }
 
   ngOnInit() {
-    //this.getSongsFromDB();
-    var userPlan = window.localStorage.getItem('userPlan');
-    var plan_arr = userPlan.split(',');
-
+    const userPlan = window.localStorage.getItem('userPlan');
+    const plan_arr = userPlan.split(',');
     this.normalSongs = [];
     this.instrumentalSongs = [];
     this.backgroundVocalsSongs = [];
     this.otherSongs = [];
     this.songsToDownload_new = [];
+    this.saveSongsList = [];
 
-    Object.keys(plan_arr).forEach(key=> {
-        //console.log(plan_arr[key])  ;     
-        let plan_name = plan_arr[key];
+    this.nativeStorage.getItem('songs').then(dbSongs => {
+      Object.keys(plan_arr).forEach(key => {
+        // console.log(plan_arr[key])  ;
+        const plan_name = plan_arr[key];
         console.log('Plan == ' + plan_name);
-
         const songSub = this.songService.getSongs(plan_name).subscribe(apiSongs => {
           console.log(plan_name + '===== from Database ====');
           console.log(apiSongs);
-          
-          //apiSongs.push(apiSongs);
+          this.saveSongsList = dbSongs;
           this.filterSongsByReleaseDateNew(apiSongs); // All Songs may just be dbSongs
-          
         });
-
+      });
     });
-
-    
-
   }
 
 
@@ -76,51 +70,44 @@ export class LibraryPage implements OnInit {
       songs = songs.filter(song => new Date(song.releaseDate) > new Date('12/31/18'));
     }
     const filteredSongs = songs.filter(song => new Date(song.releaseDate) < currentDate);
+
     filteredSongs.forEach(song => {
-      if (song.audioPath) {
+      let isFound = true;
+
+      this.saveSongsList.forEach(s => {
+        if (song.title === s.title) {
+          isFound = false;
+        }
+      });
+
+      if (isFound === true) {
+        this.songsToDownload_new.push(song);
+      }
+    });
+
+    this.saveSongsList.forEach(song => {
+      if (song.audioPath !== '') {
+        let check;
         switch (song.songType) {
           case SongType.Normal:
-            this.normalSongs.push(song);
+            check = this.normalSongs.find(s => s.title === song.title);
+            if (!check) {this.normalSongs.push(song);}
             break;
           case SongType.Instrumental:
-            this.instrumentalSongs.push(song);
+            check = this.instrumentalSongs.find(s => s.title === song.title);
+            if (!check) {this.instrumentalSongs.push(song);}
             break;
           case SongType.BackgroundVocals:
-            this.backgroundVocalsSongs.push(song);
+           check = this.backgroundVocalsSongs.find(s => s.title === song.title);
+            if (!check) {this.backgroundVocalsSongs.push(song);}
             break;
           case SongType.Other:
-            this.otherSongs.push(song);
+            check = this.otherSongs.find(s => s.title === song.title);
+            if (!check) {this.otherSongs.push(song);}
             break;
           default:
             alert('Invalid Song Type');
         }
-      } else {
-
-        var my_songs = [];
-        console.log(this.songsToDownload_new);
-
-        if (this.songsToDownload_new.length == 0) {   
-           
-           this.songsToDownload_new.push(song);
-            
-
-          } else {
-
-            let isfound = 'true';
-            Object.keys(this.songsToDownload_new).forEach(key=> {                    
-                let plan_title = this.songsToDownload_new[key];
-                if(plan_title.title == song.title){                 
-                   isfound = 'false'; return false;
-                }
-              
-            });
-            if(isfound == 'true'){
-              this.songsToDownload_new.push(song);
-            }
-
-          }
-
-
       }
     });
     this.sortSongs();
@@ -149,8 +136,8 @@ export class LibraryPage implements OnInit {
           default:
             alert('Invalid Song Type');
         }
-        this.songsToDownload.splice(index, 1);
-        this.saveSongs();
+        this.songsToDownload_new.splice(index, 1);
+        this.saveSongs(song);
         this.helper.dismissLoading();
       });
     });
@@ -192,10 +179,7 @@ export class LibraryPage implements OnInit {
 
   getSongsFromDB(): void {
     this.nativeStorage.getItem('songs').then(dbSongs => {
-      this.allSongs = dbSongs;
-      this.getSongsFromFirebase();
-    }).catch(() => {
-      this.getSongsFromFirebase();
+      this.saveSongsList = dbSongs;
     });
   }
 
@@ -204,8 +188,7 @@ export class LibraryPage implements OnInit {
     const songSub = this.songService.getSongs('gggg').subscribe(apiSongs => {
       console.log(apiSongs);
       this.addNewSongs(apiSongs);
-      console.log(this.allSongs);
-      this.filterSongsByReleaseDate(this.allSongs); // All Songs may just be dbSongs
+      this.filterSongsByReleaseDateNew(this.allSongs); // All Songs may just be dbSongs
       songSub.unsubscribe();
     });
   }
@@ -245,17 +228,15 @@ export class LibraryPage implements OnInit {
     }
   }
 
-  private saveSongs(): void {
-    const allSongs = this.normalSongs.concat(
-      this.instrumentalSongs.concat(this.backgroundVocalsSongs.concat(this.otherSongs.concat(this.songsToDownload)))
-    );
-    this.nativeStorage.setItem('songs', allSongs);
+  private saveSongs(song: Song): void {
+    this.saveSongsList.push(song);
+    this.nativeStorage.setItem('songs', this.saveSongsList);
   }
 
   private sortSongs(): void {
     this.normalSongs.sort((a, b) => new Date(a.releaseDate).getTime() - new Date(b.releaseDate).getTime());
     this.instrumentalSongs.sort((a, b) => new Date(a.releaseDate).getTime() - new Date(b.releaseDate).getTime());
-    this.songsToDownload.sort((a, b) => new Date(a.releaseDate).getTime() - new Date(b.releaseDate).getTime());
+    this.songsToDownload_new.sort((a, b) => new Date(a.releaseDate).getTime() - new Date(b.releaseDate).getTime());
     this.backgroundVocalsSongs.sort((a, b) => new Date(a.releaseDate).getTime() - new Date(b.releaseDate).getTime());
     this.otherSongs.sort((a, b) => new Date(a.releaseDate).getTime() - new Date(b.releaseDate).getTime());
   }

@@ -32,13 +32,13 @@ export class SongService {
   }
 
   private init(): void {
-    this.songsCollection = this.db.collection<Song>('songs');
+    this.songsCollection = this.db.collection<Song>('songsList');
   }
 
   getSongs(isplan): Observable<Song[]> {
     //var plan_name = window.localStorage.getItem('userPlan')
-    
-    this.songsCollectionByPlan = this.db.collection<Song>('songs',
+
+    this.songsCollectionByPlan = this.db.collection<Song>('songsList',
       ref => ref.where('plan_name', 'array-contains', isplan));
     return this.songsCollectionByPlan.valueChanges();
 
@@ -135,17 +135,17 @@ export class SongService {
       //         this.soundFile = e.nativeURL;
       //         this.soundPath = e.fullPath;
       //         console.debug(this.soundPath);
-        
+
       //         // Sounds.save($scope.sound).then(function() {
       //         //   $ionicHistory.nextViewOptions({
       //         //       disableBack: true
       //         //   });
       //         //   $state.go("home");
       //         // });
-              
+
       //       }, function(e) {
       //         console.log('error in coipy');console.dir(e);
-      //       });					
+      //       });
       //     }, function(e) {
       //       console.log("error in inner bullcrap");
       //       console.dir(e);
@@ -167,13 +167,13 @@ export class SongService {
     xhr.send();
     console.log('going to download song');
   }
-  
+
 //   downloadSongFileWay(): void {
 //     window.requestFileSystem(window.TEMPORARY, 5 * 1024 * 1024, (fs) => {
 
 //       console.log('file system open: ' + fs.name);
 //       this.getSampleFile(fs.root);
-  
+
 //     }, (error) => console.log(error));
 //   }
 
