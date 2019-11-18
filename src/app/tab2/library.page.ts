@@ -44,20 +44,39 @@ export class LibraryPage implements OnInit {
     this.otherSongs = [];
     this.songsToDownload_new = [];
     this.saveSongsList = [];
+    let songExisting = false;
 
     this.nativeStorage.getItem('songs').then(dbSongs => {
+        songExisting = true;
+        Object.keys(plan_arr).forEach(key => {
+            // console.log(plan_arr[key])  ;
+            const plan_name = plan_arr[key];
+            console.log('Plan == ' + plan_name);
+            const songSub = this.songService.getSongs(plan_name).subscribe(apiSongs => {
+              console.log(plan_name + '===== from Database ====');
+              console.log(apiSongs);
+              this.saveSongsList = dbSongs;
+              this.filterSongsByReleaseDateNew(apiSongs); // All Songs may just be dbSongs
+            });
+          }
+        );
+      },
+      error => console.log(JSON.stringify(error))
+    );
+
+    if (songExisting === false) {
       Object.keys(plan_arr).forEach(key => {
-        // console.log(plan_arr[key])  ;
-        const plan_name = plan_arr[key];
-        console.log('Plan == ' + plan_name);
-        const songSub = this.songService.getSongs(plan_name).subscribe(apiSongs => {
-          console.log(plan_name + '===== from Database ====');
-          console.log(apiSongs);
-          this.saveSongsList = dbSongs;
-          this.filterSongsByReleaseDateNew(apiSongs); // All Songs may just be dbSongs
-        });
-      });
-    });
+          // console.log(plan_arr[key])  ;
+          const plan_name = plan_arr[key];
+          console.log('Plan == ' + plan_name);
+          const songSub = this.songService.getSongs(plan_name).subscribe(apiSongs => {
+            console.log(plan_name + '===== from Database ====');
+            console.log(apiSongs);
+            this.filterSongsByReleaseDateNew(apiSongs); // All Songs may just be dbSongs
+          });
+        }
+      );
+    }
   }
 
 
@@ -91,19 +110,27 @@ export class LibraryPage implements OnInit {
         switch (song.songType) {
           case SongType.Normal:
             check = this.normalSongs.find(s => s.title === song.title);
-            if (!check) {this.normalSongs.push(song);}
+            if (!check) {
+              this.normalSongs.push(song);
+            }
             break;
           case SongType.Instrumental:
             check = this.instrumentalSongs.find(s => s.title === song.title);
-            if (!check) {this.instrumentalSongs.push(song);}
+            if (!check) {
+              this.instrumentalSongs.push(song);
+            }
             break;
           case SongType.BackgroundVocals:
-           check = this.backgroundVocalsSongs.find(s => s.title === song.title);
-            if (!check) {this.backgroundVocalsSongs.push(song);}
+            check = this.backgroundVocalsSongs.find(s => s.title === song.title);
+            if (!check) {
+              this.backgroundVocalsSongs.push(song);
+            }
             break;
           case SongType.Other:
             check = this.otherSongs.find(s => s.title === song.title);
-            if (!check) {this.otherSongs.push(song);}
+            if (!check) {
+              this.otherSongs.push(song);
+            }
             break;
           default:
             alert('Invalid Song Type');
