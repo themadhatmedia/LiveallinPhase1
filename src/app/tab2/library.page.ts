@@ -49,7 +49,6 @@ export class LibraryPage implements OnInit {
     this.nativeStorage.getItem('songs').then(dbSongs => {
         songExisting = true;
         Object.keys(plan_arr).forEach(key => {
-            // console.log(plan_arr[key])  ;
             const plan_name = plan_arr[key];
             console.log('Plan == ' + plan_name);
             const songSub = this.songService.getSongs(plan_name).subscribe(apiSongs => {
@@ -57,26 +56,23 @@ export class LibraryPage implements OnInit {
               console.log(apiSongs);
               this.saveSongsList = dbSongs;
               this.filterSongsByReleaseDateNew(apiSongs); // All Songs may just be dbSongs
+              this.renderSavedSongs(dbSongs);
             });
           }
         );
-      },
-      error => console.log(JSON.stringify(error))
-    );
-
-    if (songExisting === false) {
-      Object.keys(plan_arr).forEach(key => {
-          // console.log(plan_arr[key])  ;
-          const plan_name = plan_arr[key];
-          console.log('Plan == ' + plan_name);
-          const songSub = this.songService.getSongs(plan_name).subscribe(apiSongs => {
-            console.log(plan_name + '===== from Database ====');
-            console.log(apiSongs);
-            this.filterSongsByReleaseDateNew(apiSongs); // All Songs may just be dbSongs
-          });
-        }
-      );
-    }
+      },(error) => {
+      console.log(JSON.stringify(error))
+        Object.keys(plan_arr).forEach(key => {
+                // console.log(plan_arr[key])  ;
+            const plan_name = plan_arr[key];
+            console.log('Plan == ' + plan_name);
+            const songSub = this.songService.getSongs(plan_name).subscribe(apiSongs => {
+                console.log(plan_name + '===== from Database ====');
+                console.log(apiSongs);
+                this.filterSongsByReleaseDateNew(apiSongs); // All Songs may just be dbSongs
+            });
+        });
+    });
   }
 
 
@@ -91,28 +87,27 @@ export class LibraryPage implements OnInit {
     const filteredSongs = songs.filter(song => new Date(song.releaseDate) < currentDate);
 
     filteredSongs.forEach(song => {
-      let isFound = true;
+      let notDuplicate = true;
+      let notDownloaded = true;
 
-      this.saveSongsList.forEach(s => {
-        if (song.title === s.title) {
-          isFound = false;
+      this.songsToDownload_new.map((res) => {
+        if (song.title === res.title) {
+          notDuplicate = false
         }
       });
-
-      if (isFound === true) {
-        let isDuplicate = false;
-        this.songsToDownload_new.map((res) => {
-          if (song.title === res.title) {
-            isDuplicate = true
-          }
-        });
-        if (!isDuplicate) {
-          this.songsToDownload_new.push(song);
+      this.saveSongsList.map((res) => {
+        if (song.title === res.title) {
+          notDownloaded = false
         }
+      });
+      if (notDuplicate && notDownloaded) {
+        this.songsToDownload_new.push(song);
       }
     });
-
-    this.saveSongsList.forEach(song => {
+    this.sortSongs();
+  }
+  renderSavedSongs(songList): void {
+    songList.forEach(song => {
       if (song.audioPath !== '') {
         let check;
         switch (song.songType) {
@@ -145,7 +140,6 @@ export class LibraryPage implements OnInit {
         }
       }
     });
-    this.sortSongs();
   }
 
 
