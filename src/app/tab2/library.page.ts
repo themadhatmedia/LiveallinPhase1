@@ -100,7 +100,15 @@ export class LibraryPage implements OnInit {
       });
 
       if (isFound === true) {
-        this.songsToDownload_new.push(song);
+        let isDuplicate = false;
+        this.songsToDownload_new.map((res) => {
+          if (song.title === res.title) {
+            isDuplicate = true
+          }
+        });
+        if (!isDuplicate) {
+          this.songsToDownload_new.push(song);
+        }
       }
     });
 
