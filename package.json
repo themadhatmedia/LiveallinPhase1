@@ -27,6 +27,7 @@
     "@ionic-native/file": "5.1.0",
     "@ionic-native/file-transfer": "5.1.0",
     "@ionic-native/in-app-browser": "5.2.0",
+    "@ionic-native/ionic-webview": "^5.17.0",
     "@ionic-native/media": "5.0.0",
     "@ionic-native/music-controls": "5.0.0",
     "@ionic-native/native-storage": "5.2.0",
@@ -96,9 +97,7 @@
       "cordova-plugin-streaming-media": {},
       "cordova-plugin-nativestorage": {},
       "cordova-plugin-inappbrowser": {},
-      "cordova-plugin-ionic-webview": {
-        "ANDROID_SUPPORT_ANNOTATIONS_VERSION": "27.+"
-      }
+      "cordova-plugin-ionic-webview": {}
     },
     "platforms": [
       "android",

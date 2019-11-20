@@ -5,6 +5,7 @@ import { Component, OnInit, Input, ChangeDetectorRef, AfterViewInit, ViewChild }
 import { Media, MediaObject } from '@ionic-native/media/ngx';
 import { File } from '@ionic-native/file/ngx';
 import { Platform, ModalController, IonSlides } from '@ionic/angular';
+import { WebView } from '@ionic-native/ionic-webview/ngx';
 
 enum MediaStatus {
   None = 0,
@@ -44,6 +45,7 @@ export class MusicPlayerComponent implements OnInit, AfterViewInit {
     private media: Media,
     private modalCtrl: ModalController,
     private platform: Platform,
+    private webView: WebView,
     public songService: SongService
   ) { }
 
@@ -153,8 +155,15 @@ export class MusicPlayerComponent implements OnInit, AfterViewInit {
       let mediaUrl = this.activeSong.audioPath;
       if (this.platform.is('ios')) {
         mediaUrl = '../Library/NoCloud/' + mediaUrl.split('/').pop();
+        // console.log("IOS Normal: ", mediaUrl)
+        // const convertMediaUrl = this.webView.convertFileSrc(mediaUrl)
+        console.log("IOS converted: ", mediaUrl)
+
+        this.musicPlayer = this.media.create(mediaUrl);
+
+      }else{
+        this.musicPlayer = this.media.create(mediaUrl);
       }
-      console.log(mediaUrl);
       // let fileName = this.activeSong.title.replace(/[^A-Za-z]/g, '');
       // fileName += '.svg';
       // this.file.readAsDataURL(this.file.dataDirectory, fileName).then(res => {
@@ -162,7 +171,6 @@ export class MusicPlayerComponent implements OnInit, AfterViewInit {
       //   console.log(res);
       // });
       // console.log(this.activeSong.imagePath);
-      this.musicPlayer = this.media.create(mediaUrl);
 
       // this.nextSongTimer = setTimeout(() => {
       //   this.playNextSong();

@@ -1,3 +1,4 @@
+import { WebView } from '@ionic-native/ionic-webview/ngx';
 import { HelperService } from './helper.service';
 import { NativeStorage } from '@ionic-native/native-storage/ngx';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
@@ -7,7 +8,6 @@ import { AngularFireStorage, AngularFireUploadTask } from '@angular/fire/storage
 import { Song } from '../models/song.model';
 import { File } from '@ionic-native/file/ngx';
 import { FileTransfer, FileUploadOptions, FileTransferObject } from '@ionic-native/file-transfer/ngx';
-
 import { AuthService } from '../../core/services/auth.service';
 
 @Injectable({ providedIn: 'root' })
@@ -26,7 +26,8 @@ export class SongService {
     private transfer: FileTransfer,
     private db: AngularFirestore,
     private nativeStorage: NativeStorage,
-    private storage: AngularFireStorage
+    private storage: AngularFireStorage,
+    private webView: WebView
   ) {
     this.init();
   }
@@ -54,7 +55,9 @@ export class SongService {
     const fileTransfer: FileTransferObject = this.transfer.create();
     // const url = `https://firebasestorage.googleapis.com/v0/b/live-all-in-test.appspot.com/o/audio%2FBe%20Where%20You%20Are.mp3?alt=media&token=819e99ea-0a22-4d56-9f05-c51257d53fae`;
     // this.soundPath = entry.toURL();
-    return fileTransfer.download(song.audioUrl, this.file.dataDirectory + fileName);
+
+    let folderPath = `${this.file.dataDirectory}${fileName}`;
+    return fileTransfer.download(song.audioUrl, folderPath);
   }
 
   downloadSongImage(song: Song): Promise<any> {

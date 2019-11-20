@@ -34,7 +34,7 @@ import { MusicPlayerComponent } from './core/components/music-player/music-playe
 import { SignupComponent } from './core/components/signup/signup.component';
 // import { environment } from './../environments/environment.prod';
 
-
+import { WebView } from '@ionic-native/ionic-webview/ngx';
 @NgModule({
   declarations: [AppComponent, MusicPlayerComponent, SignupComponent],
   entryComponents: [MusicPlayerComponent, SignupComponent],
@@ -57,6 +57,7 @@ import { SignupComponent } from './core/components/signup/signup.component';
     StreamingMedia,
     StatusBar,
     SplashScreen,
+    WebView,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],
   bootstrap: [AppComponent]
