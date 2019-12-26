@@ -16,7 +16,7 @@ export class AuthService {
     private auth: AngularFireAuth,
     private db: AngularFirestore
   ) {
-    this.usersCollection = this.db.collection<User>('users');
+    this.usersCollection = this.db.collection<User>('users2');
   }
 
   createUser(user: User, password: string): Promise<any> {
@@ -32,7 +32,7 @@ export class AuthService {
   }
 
   getUser(firebaseUser: firebase.User): Observable<any> {
-    const userRef = this.db.collection('users').doc(firebaseUser.email);
+    const userRef = this.db.collection('users2').doc(firebaseUser.email);
     return userRef.get();
   }
 
@@ -46,7 +46,7 @@ export class AuthService {
   }
 
   getUserFromDB(userEmail: string): Observable<User[]> {
-    const userQuery = this.db.collection<User>('users', ref => ref.where('email', '==', userEmail)).valueChanges();
+    const userQuery = this.db.collection<User>('users2', ref => ref.where('email', '==', userEmail)).valueChanges();
     return userQuery;
   }
 
@@ -55,7 +55,7 @@ export class AuthService {
       console.log('token: ' + JSON.stringify(token));
 
       window.localStorage.setItem('userEmail',token.user.email);
-      const userQuery = this.db.collection<User>('users', ref => ref.where('email', '==', token.user.email)).valueChanges();
+      const userQuery = this.db.collection<User>('users2', ref => ref.where('email', '==', token.user.email)).valueChanges();
       userQuery
       .subscribe(docs => {
         this.user = docs[0];
@@ -75,7 +75,7 @@ export class AuthService {
     this.auth.auth.sendPasswordResetEmail(email);
   }
 
-  /** 
+  /**
    *     public email: string = '',
     public firstName: string = '',
     public lastName: string = '',
